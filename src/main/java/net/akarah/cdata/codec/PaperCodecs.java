@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.util.Vector;
 
 public class PaperCodecs {
     public static Codec<Material> MATERIAL = Codec.STRING
@@ -17,6 +18,7 @@ public class PaperCodecs {
     public static Codec<World> WORLD = Codec.STRING.xmap(Bukkit::getWorld, WorldInfo::getName);
 
     public static Codec<BlockData> BLOCK_DATA = Codec.STRING.xmap(Bukkit::createBlockData, BlockData::getAsString);
+
     public static Codec<BlockState> BLOCK_STATE = PaperCodecs.BLOCK_DATA.xmap(BlockData::createBlockState, BlockState::getBlockData);
 
     public static Codec<Location> LOCATION = RecordCodecBuilder.create(instance -> instance.group(
@@ -27,4 +29,10 @@ public class PaperCodecs {
             Codec.FLOAT.fieldOf("pitch").forGetter(Location::getPitch),
             Codec.FLOAT.fieldOf("yaw").forGetter(Location::getYaw)
     ).apply(instance, Location::new));
+
+    public static Codec<Vector> VECTOR = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.DOUBLE.fieldOf("x").forGetter(Vector::getX),
+            Codec.DOUBLE.fieldOf("y").forGetter(Vector::getY),
+            Codec.DOUBLE.fieldOf("z").forGetter(Vector::getZ)
+    ).apply(instance, Vector::new));
 }
