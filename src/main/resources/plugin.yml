@@ -1,0 +1,7 @@
+name: akarahnet-engine
+version: 0.0.0
+main: net.akarah.Main
+description: The core engine plugin for akarahnet.
+author: Endistic
+website: https://akarah.net
+api-version: "1.21.5"
