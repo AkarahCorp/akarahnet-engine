@@ -6,6 +6,8 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.BlocksAttacks;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
+import net.akarah.cdata.codec.EnumCodec;
+import net.akarah.cdata.codec.PaperCodecs;
 import net.akarah.cdata.util.Colors;
 import net.akarah.cdata.util.Formatters;
 import net.akarah.cdata.Registries;
@@ -31,13 +33,9 @@ public record CustomItem(
         Optional<Boolean> hasClickAction
 ) implements RegistryElement<CustomItem> {
     public static Codec<CustomItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING
-                    .xmap(x -> Material.getMaterial(x.toUpperCase()), x -> x.name().toLowerCase())
-                    .fieldOf("type").forGetter(CustomItem::type),
+            PaperCodecs.MATERIAL.fieldOf("type").forGetter(CustomItem::type),
             Codec.STRING.fieldOf("name").forGetter(CustomItem::name),
-            Codec.STRING
-                    .xmap(x -> Rarity.valueOf(x.toUpperCase()), x -> x.name().toLowerCase())
-                    .optionalFieldOf("rarity").forGetter(CustomItem::rarity),
+            EnumCodec.of(Rarity.class).optionalFieldOf("rarity").forGetter(CustomItem::rarity),
             Codec.STRING.optionalFieldOf("description").forGetter(CustomItem::description),
             Codec.BOOL.optionalFieldOf("has_click_action").forGetter(CustomItem::hasClickAction)
     ).apply(instance, CustomItem::new));

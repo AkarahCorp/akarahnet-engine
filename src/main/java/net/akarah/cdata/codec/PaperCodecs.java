@@ -1,0 +1,30 @@
+package net.akarah.cdata.codec;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.generator.WorldInfo;
+
+public class PaperCodecs {
+    public static Codec<Material> MATERIAL = Codec.STRING
+            .xmap(x -> Material.getMaterial(x.toUpperCase()), x -> x.name().toLowerCase());
+
+    public static Codec<World> WORLD = Codec.STRING.xmap(Bukkit::getWorld, WorldInfo::getName);
+
+    public static Codec<BlockData> BLOCK_DATA = Codec.STRING.xmap(Bukkit::createBlockData, BlockData::getAsString);
+    public static Codec<BlockState> BLOCK_STATE = PaperCodecs.BLOCK_DATA.xmap(BlockData::createBlockState, BlockState::getBlockData);
+
+    public static Codec<Location> LOCATION = RecordCodecBuilder.create(instance -> instance.group(
+            PaperCodecs.WORLD.fieldOf("world").forGetter(Location::getWorld),
+            Codec.DOUBLE.fieldOf("x").forGetter(Location::x),
+            Codec.DOUBLE.fieldOf("y").forGetter(Location::y),
+            Codec.DOUBLE.fieldOf("z").forGetter(Location::z),
+            Codec.FLOAT.fieldOf("pitch").forGetter(Location::getPitch),
+            Codec.FLOAT.fieldOf("yaw").forGetter(Location::getYaw)
+    ).apply(instance, Location::new));
+}
