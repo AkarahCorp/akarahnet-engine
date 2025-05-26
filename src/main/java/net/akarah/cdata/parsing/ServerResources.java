@@ -2,7 +2,6 @@ package net.akarah.cdata.parsing;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.mojang.serialization.Encoder;
 import com.mojang.serialization.JsonOps;
 import net.akarah.cdata.Engine;
 import net.kyori.adventure.key.Key;
@@ -60,23 +59,19 @@ public class ServerResources {
             var json = new Gson().fromJson(Files.readString(path), JsonElement.class);
             var encoded = registryCodec.decode(JsonOps.INSTANCE, json);
 
-
             var subpath = path.subpath(4, path.getNameCount());
             @Subst("empty") var keyValue = subpath.toString().replace(".json", "");
 
             var entryKey = Key.key(namespace, keyValue);
 
             if(encoded.isError()) {
-                Engine.logger().error("Error occured while loading resource {} / {}", registryKey, entryKey);
+                Engine.logger().error("Error occurred while loading resource {} / {}", registryKey, entryKey);
                 Engine.logger().error(encoded.error().orElseThrow().message());
                 return;
             }
             var encodedFinal = encoded.getOrThrow().getFirst();
 
             dataRegistry.insert(entryKey, encodedFinal);
-
-            System.out.println(subpath);
-            // TODO: do stuff with `encoded`, `namespace`, and figure out the file's path
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
