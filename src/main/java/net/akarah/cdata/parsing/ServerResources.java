@@ -38,6 +38,8 @@ public class ServerResources {
     }
 
     public <T> void loadFromPath(Path path) {
+        System.out.println(path);
+
         var cdataName = path.getName(1).toString();
         assert cdataName.equals("cdata");
 

@@ -3,27 +3,87 @@ package net.akarah.cdata.item;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.BlocksAttacks;
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
+import net.akarah.cdata.util.Colors;
+import net.akarah.cdata.util.Formatters;
 import net.akarah.cdata.Registries;
 import net.akarah.cdata.parsing.RegistryElement;
 import net.akarah.cdata.parsing.ResourceRegistry;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public record CustomItem(
         Material type,
-        String name
+        String name,
+        Optional<Rarity> rarity,
+        Optional<String> description,
+        Optional<Boolean> hasClickAction
 ) implements RegistryElement<CustomItem> {
     public static Codec<CustomItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING
                     .xmap(x -> Material.getMaterial(x.toUpperCase()), x -> x.name().toLowerCase())
                     .fieldOf("type").forGetter(CustomItem::type),
-            Codec.STRING.fieldOf("name").forGetter(CustomItem::name)
+            Codec.STRING.fieldOf("name").forGetter(CustomItem::name),
+            Codec.STRING
+                    .xmap(x -> Rarity.valueOf(x.toUpperCase()), x -> x.name().toLowerCase())
+                    .optionalFieldOf("rarity").forGetter(CustomItem::rarity),
+            Codec.STRING.optionalFieldOf("description").forGetter(CustomItem::description),
+            Codec.BOOL.optionalFieldOf("has_click_action").forGetter(CustomItem::hasClickAction)
     ).apply(instance, CustomItem::new));
 
     public ItemStack toItemStack() {
         var is = ItemStack.of(this.type);
-        is.setData(DataComponentTypes.ITEM_NAME, Component.text(this.name));
+        is.setData(DataComponentTypes.ITEM_NAME, Component.text(this.name).color(
+                this.rarity.map(x -> x.color).orElse(Colors.WHITE)
+        ));
+
+        var lore = OutputLore.empty();
+        this.description.ifPresent(description -> {
+            var descriptionLines = Formatters.splitIntoLines(description, 40);
+            for(var line : descriptionLines) {
+                lore.addLine(Component.text(line).color(Colors.LIGHT_GRAY));
+            }
+            lore.addLine(Component.empty());
+        });
+
+        this.rarity.ifPresent(rarity ->
+                lore.addLine(Component.text(Formatters.toSmallCaps(rarity.name().toLowerCase())).color(rarity.color)));
+
+        this.hasClickAction.ifPresent(hasClickAction -> {
+            if(hasClickAction) {
+                lore.addLine(Component.text("Click me!").color(Colors.YELLOW));
+            }
+        });
+
+        is.setData(DataComponentTypes.LORE, lore.build());
+
+        is.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
+                .hiddenComponents(Set.of(DataComponentTypes.ATTRIBUTE_MODIFIERS))
+                .build());
+
+        if(this.type.name().contains("SWORD")) {
+            is.setData(DataComponentTypes.BLOCKS_ATTACKS, BlocksAttacks.blocksAttacks().damageReductions(List.of()).build());
+        }
+
+        is.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.itemAttributes()
+                .addModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
+                        new NamespacedKey("akarahnet", "base"),
+                        1000.0,
+                        AttributeModifier.Operation.ADD_NUMBER,
+                        EquipmentSlotGroup.ANY
+                ))
+                .build());
         return is;
     }
 
