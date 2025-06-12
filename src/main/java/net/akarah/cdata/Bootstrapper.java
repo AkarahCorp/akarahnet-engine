@@ -2,6 +2,8 @@ package net.akarah.cdata;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySelectorArgumentResolver;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -54,6 +56,23 @@ public class Bootstrapper implements PluginBootstrap {
                         })
                 );
             }));
+
+            root.then(
+                    Commands.literal("stats_of").then(
+                            Commands.argument("entity", ArgumentTypes.entity()).executes(ctx -> {
+                                var entity = ctx.getArgument("entity", EntitySelectorArgumentResolver.class)
+                                        .resolve(ctx.getSource())
+                                        .getFirst();
+                                if(ctx.getSource().getSender() instanceof Player p) {
+                                    p.sendMessage(
+                                            Engine.statManager().getEntityStats(entity)
+                                                    .toString()
+                                    );
+                                }
+                                return 0;
+                            })
+                    )
+            );
 
             root.then(itemRoot);
             root.then(entityRoot);

@@ -8,6 +8,7 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import net.akarah.cdata.codec.EnumCodec;
 import net.akarah.cdata.codec.PaperCodecs;
+import net.akarah.cdata.stat.StatsObject;
 import net.akarah.cdata.util.Colors;
 import net.akarah.cdata.util.Formatters;
 import net.akarah.cdata.Registries;
@@ -15,6 +16,7 @@ import net.akarah.cdata.parsing.RegistryElement;
 import net.akarah.cdata.parsing.ResourceRegistry;
 import net.akarah.cdata.util.Keys;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -32,14 +34,18 @@ public record CustomItem(
         Component name,
         Optional<Rarity> rarity,
         Optional<String> description,
-        Optional<Boolean> hasClickAction
+        Optional<String> clickAction,
+        Optional<StatsObject> stats,
+        boolean statsInOffHand
 ) implements RegistryElement<CustomItem> {
     public static Codec<CustomItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             PaperCodecs.MATERIAL.fieldOf("type").forGetter(CustomItem::type),
             PaperCodecs.MINI_MESSAGE_COMPONENT.fieldOf("name").forGetter(CustomItem::name),
             EnumCodec.of(Rarity.class).optionalFieldOf("rarity").forGetter(CustomItem::rarity),
             Codec.STRING.optionalFieldOf("description").forGetter(CustomItem::description),
-            Codec.BOOL.optionalFieldOf("has_click_action").forGetter(CustomItem::hasClickAction)
+            Codec.STRING.optionalFieldOf("click_action").forGetter(CustomItem::clickAction),
+            StatsObject.CODEC.optionalFieldOf("stats").forGetter(CustomItem::stats),
+            Codec.BOOL.optionalFieldOf("stats_in_offhand", false).forGetter(CustomItem::statsInOffHand)
     ).apply(instance, CustomItem::new));
 
     public ItemStack toItemStack() {
@@ -48,20 +54,38 @@ public record CustomItem(
 
         var lore = OutputLore.empty();
         this.description.ifPresent(description -> {
+            lore.addLine(Component.empty());
             var descriptionLines = Formatters.splitIntoLines(description, 40);
             for(var line : descriptionLines) {
                 lore.addLine(Component.text(line).color(Colors.LIGHT_GRAY));
             }
-            lore.addLine(Component.empty());
         });
 
-        this.rarity.ifPresent(rarity ->
-                lore.addLine(Component.text(Formatters.toSmallCaps(rarity.name().toLowerCase())).color(rarity.color)));
+        this.stats.ifPresent(stats -> {
+            lore.addLine(Component.empty());
+            for(var stat : stats.keySet()) {
+                var customStat = Registries.CUSTOM_STAT.get(stat).orElseThrow();
 
-        this.hasClickAction.ifPresent(hasClickAction -> {
-            if(hasClickAction) {
-                lore.addLine(Component.text("Click me!").color(Colors.YELLOW));
+                var line = Component.text(customStat.name() + ": ").color(TextColor.color(133, 133, 133));
+                var value = stats.get(stat);
+                if(value > 0) {
+                    line = line.append(Component.text("+" + value).color(TextColor.color(0, 255, 0)));
+                } else {
+                    line = line.append(Component.text("-" + value).color(TextColor.color(255, 0, 0)));
+                }
+
+                lore.addLine(line);
             }
+        });
+
+        this.rarity.ifPresent(rarity -> {
+            lore.addLine(Component.empty());
+            lore.addLine(Component.text(Formatters.toSmallCaps(rarity.name().toLowerCase())).color(rarity.color));
+        });
+
+        this.clickAction.ifPresent(clickAction -> {
+            lore.addLine(Component.empty());
+            lore.addLine(Component.text(clickAction).color(Colors.YELLOW));
         });
 
         is.setData(DataComponentTypes.LORE, lore.build());
@@ -83,9 +107,7 @@ public record CustomItem(
                 ))
                 .build());
 
-        is.editPersistentDataContainer(pdc -> {
-            pdc.set(Keys.ID, PersistentDataType.STRING, this.key().toString());
-        });
+        is.editPersistentDataContainer(pdc -> pdc.set(Keys.ID, PersistentDataType.STRING, this.key().toString()));
         return is;
     }
 

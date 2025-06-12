@@ -7,6 +7,7 @@ import net.akarah.cdata.Registries;
 import net.akarah.cdata.codec.PaperCodecs;
 import net.akarah.cdata.parsing.RegistryElement;
 import net.akarah.cdata.parsing.ResourceRegistry;
+import net.akarah.cdata.stat.StatsObject;
 import net.akarah.cdata.util.Keys;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -14,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Optional;
@@ -21,13 +23,13 @@ import java.util.Optional;
 public record CustomEntity(
         EntityType entityType,
         Component name,
-        Optional<Double> health,
+        Optional<StatsObject> stats,
         boolean invincible
 ) implements RegistryElement<CustomEntity> {
     public static Codec<CustomEntity> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             PaperCodecs.ENTITY_TYPE.fieldOf("type").forGetter(CustomEntity::entityType),
             PaperCodecs.MINI_MESSAGE_COMPONENT.fieldOf("name").forGetter(CustomEntity::name),
-            Codec.DOUBLE.optionalFieldOf("health").forGetter(CustomEntity::health),
+            StatsObject.CODEC.optionalFieldOf("stats").forGetter(CustomEntity::stats),
             Codec.BOOL.optionalFieldOf("invincible", false).forGetter(CustomEntity::invincible)
     ).apply(instance, CustomEntity::new));
 
@@ -48,8 +50,10 @@ public record CustomEntity(
 
         var pdc = mob.getPersistentDataContainer();
         pdc.set(Keys.ID, PersistentDataType.STRING, id.value());
-        this.health.ifPresent(value -> {
-            pdc.set(Keys.HEALTH, PersistentDataType.DOUBLE, value);
+        this.stats.ifPresent(stats -> {
+            if(mob instanceof LivingEntity le) {
+                stats.applyAttributes(le);
+            }
         });
         if(this.invincible) {
             pdc.set(Keys.INVINCIBLE, PersistentDataType.BOOLEAN, true);
