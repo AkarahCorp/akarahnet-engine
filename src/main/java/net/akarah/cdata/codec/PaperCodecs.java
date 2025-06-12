@@ -2,12 +2,16 @@ package net.akarah.cdata.codec;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.akarah.cdata.Engine;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.EntityType;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.util.Vector;
 
@@ -19,7 +23,10 @@ public class PaperCodecs {
 
     public static Codec<BlockData> BLOCK_DATA = Codec.STRING.xmap(Bukkit::createBlockData, BlockData::getAsString);
 
-    public static Codec<BlockState> BLOCK_STATE = PaperCodecs.BLOCK_DATA.xmap(BlockData::createBlockState, BlockState::getBlockData);
+    public static Codec<BlockState> BLOCK_STATE = PaperCodecs.BLOCK_DATA.xmap(
+            BlockData::createBlockState,
+            BlockState::getBlockData
+    );
 
     public static Codec<Location> LOCATION = RecordCodecBuilder.create(instance -> instance.group(
             PaperCodecs.WORLD.fieldOf("world").forGetter(Location::getWorld),
@@ -35,4 +42,10 @@ public class PaperCodecs {
             Codec.DOUBLE.fieldOf("y").forGetter(Vector::getY),
             Codec.DOUBLE.fieldOf("z").forGetter(Vector::getZ)
     ).apply(instance, Vector::new));
+
+    public static Codec<Component> MINI_MESSAGE_COMPONENT = Codec.STRING.xmap(Engine::mm, Engine::mm);
+
+    public static Codec<Key> KEY = Codec.STRING.xmap(Key::key, Key::asString);
+
+    public static Codec<EntityType> ENTITY_TYPE = EnumCodec.of(EntityType.class);
 }

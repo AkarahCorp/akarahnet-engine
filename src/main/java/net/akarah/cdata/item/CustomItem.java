@@ -13,6 +13,7 @@ import net.akarah.cdata.util.Formatters;
 import net.akarah.cdata.Registries;
 import net.akarah.cdata.parsing.RegistryElement;
 import net.akarah.cdata.parsing.ResourceRegistry;
+import net.akarah.cdata.util.Keys;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -20,6 +21,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,14 +29,14 @@ import java.util.Set;
 
 public record CustomItem(
         Material type,
-        String name,
+        Component name,
         Optional<Rarity> rarity,
         Optional<String> description,
         Optional<Boolean> hasClickAction
 ) implements RegistryElement<CustomItem> {
     public static Codec<CustomItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             PaperCodecs.MATERIAL.fieldOf("type").forGetter(CustomItem::type),
-            Codec.STRING.fieldOf("name").forGetter(CustomItem::name),
+            PaperCodecs.MINI_MESSAGE_COMPONENT.fieldOf("name").forGetter(CustomItem::name),
             EnumCodec.of(Rarity.class).optionalFieldOf("rarity").forGetter(CustomItem::rarity),
             Codec.STRING.optionalFieldOf("description").forGetter(CustomItem::description),
             Codec.BOOL.optionalFieldOf("has_click_action").forGetter(CustomItem::hasClickAction)
@@ -42,9 +44,7 @@ public record CustomItem(
 
     public ItemStack toItemStack() {
         var is = ItemStack.of(this.type);
-        is.setData(DataComponentTypes.ITEM_NAME, Component.text(this.name).color(
-                this.rarity.map(x -> x.color).orElse(Colors.WHITE)
-        ));
+        is.setData(DataComponentTypes.ITEM_NAME, this.name);
 
         var lore = OutputLore.empty();
         this.description.ifPresent(description -> {
@@ -82,6 +82,10 @@ public record CustomItem(
                         EquipmentSlotGroup.ANY
                 ))
                 .build());
+
+        is.editPersistentDataContainer(pdc -> {
+            pdc.set(Keys.ID, PersistentDataType.STRING, this.key().toString());
+        });
         return is;
     }
 

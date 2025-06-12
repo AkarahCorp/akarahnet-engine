@@ -23,10 +23,13 @@ public class Bootstrapper implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             var dispatcher = event.registrar();
 
-            var root = Commands.literal("cgive");
+            var root = Commands.literal("engine")
+                    .requires(x -> x.getSender().isOp());
+
+            var itemRoot = Commands.literal("give");
             Registries.CUSTOM_ITEM.forEach(((@Subst("minecraft:empty") var key, var customItem) -> {
                 System.out.println("key; " + key + " custom; " + customItem);
-                root.then(
+                itemRoot.then(
                         Commands.literal(Key.key(key.namespace(), key.value()).asString()).executes(ctx -> {
                             var sender = ctx.getSource().getSender();
                             if (sender instanceof Player p) {
@@ -37,6 +40,24 @@ public class Bootstrapper implements PluginBootstrap {
                         })
                 );
             }));
+
+            var entityRoot = Commands.literal("summon");
+            Registries.CUSTOM_ENTITY.forEach(((@Subst("minecraft:empty") var key, var customEntity) -> {
+                System.out.println("key; " + key + " custom; " + customEntity);
+                entityRoot.then(
+                        Commands.literal(Key.key(key.namespace(), key.value()).asString()).executes(ctx -> {
+                            var sender = ctx.getSource().getSender();
+                            if (sender instanceof Player p) {
+                                customEntity.spawn(p.getLocation());
+                            }
+                            return 0;
+                        })
+                );
+            }));
+
+            root.then(itemRoot);
+            root.then(entityRoot);
+
             dispatcher.register(root.build());
         });
     }
