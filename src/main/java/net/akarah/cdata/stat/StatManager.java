@@ -77,7 +77,9 @@ public class StatManager implements Listener {
 
         for(var player : Bukkit.getOnlinePlayers()) {
             var stats = Engine.statManager().getEntityStats(player);
+            stats.applyAttributes(player);
             this.stats.put(player.getUniqueId(), stats);
+
         }
     }
 
