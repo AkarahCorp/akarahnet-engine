@@ -1,4 +1,4 @@
-package net.akarah.cdata.entity;
+package net.akarah.cdata.registry.entity;
 
 import net.akarah.cdata.Engine;
 import net.akarah.cdata.util.Keys;

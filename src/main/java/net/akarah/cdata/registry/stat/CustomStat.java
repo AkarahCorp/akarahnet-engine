@@ -1,4 +1,4 @@
-package net.akarah.cdata.stat;
+package net.akarah.cdata.registry.stat;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

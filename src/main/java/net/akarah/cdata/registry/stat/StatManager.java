@@ -1,9 +1,9 @@
-package net.akarah.cdata.stat;
+package net.akarah.cdata.registry.stat;
 
 import net.akarah.cdata.Engine;
 import net.akarah.cdata.Registries;
-import net.akarah.cdata.entity.CustomEntity;
-import net.akarah.cdata.item.CustomItem;
+import net.akarah.cdata.registry.entity.CustomEntity;
+import net.akarah.cdata.registry.item.CustomItem;
 import net.akarah.cdata.util.Keys;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
@@ -16,8 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.intellij.lang.annotations.Subst;
 
 import java.util.*;

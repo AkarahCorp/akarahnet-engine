@@ -1,18 +1,15 @@
-package net.akarah.cdata.entity;
+package net.akarah.cdata.registry.entity;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.akarah.cdata.Engine;
 import net.akarah.cdata.Registries;
 import net.akarah.cdata.codec.PaperCodecs;
 import net.akarah.cdata.parsing.RegistryElement;
 import net.akarah.cdata.parsing.ResourceRegistry;
-import net.akarah.cdata.stat.StatsObject;
+import net.akarah.cdata.registry.stat.StatsObject;
 import net.akarah.cdata.util.Keys;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;

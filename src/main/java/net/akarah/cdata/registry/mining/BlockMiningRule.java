@@ -1,4 +1,4 @@
-package net.akarah.cdata.mining;
+package net.akarah.cdata.registry.mining;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

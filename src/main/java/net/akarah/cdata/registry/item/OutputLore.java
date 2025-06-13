@@ -1,4 +1,4 @@
-package net.akarah.cdata.item;
+package net.akarah.cdata.registry.item;
 
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;

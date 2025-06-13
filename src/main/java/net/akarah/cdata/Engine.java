@@ -1,9 +1,9 @@
 package net.akarah.cdata;
 
-import net.akarah.cdata.entity.CustomEntityEvents;
-import net.akarah.cdata.mining.CustomMiningEvents;
+import net.akarah.cdata.registry.entity.CustomEntityEvents;
+import net.akarah.cdata.registry.mining.CustomMiningEvents;
 import net.akarah.cdata.parsing.ServerResources;
-import net.akarah.cdata.stat.StatManager;
+import net.akarah.cdata.registry.stat.StatManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;

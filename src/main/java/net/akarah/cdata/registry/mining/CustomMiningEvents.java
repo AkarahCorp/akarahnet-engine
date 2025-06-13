@@ -1,4 +1,4 @@
-package net.akarah.cdata.mining;
+package net.akarah.cdata.registry.mining;
 
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import net.akarah.cdata.Engine;

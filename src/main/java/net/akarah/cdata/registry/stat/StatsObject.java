@@ -1,4 +1,4 @@
-package net.akarah.cdata.stat;
+package net.akarah.cdata.registry.stat;
 
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;

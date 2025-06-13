@@ -1,10 +1,10 @@
 package net.akarah.cdata;
 
-import net.akarah.cdata.entity.CustomEntity;
-import net.akarah.cdata.item.CustomItem;
-import net.akarah.cdata.mining.BlockMiningRule;
+import net.akarah.cdata.registry.entity.CustomEntity;
+import net.akarah.cdata.registry.item.CustomItem;
+import net.akarah.cdata.registry.mining.BlockMiningRule;
 import net.akarah.cdata.parsing.ResourceRegistry;
-import net.akarah.cdata.stat.CustomStat;
+import net.akarah.cdata.registry.stat.CustomStat;
 import net.kyori.adventure.key.Key;
 
 public class Registries {

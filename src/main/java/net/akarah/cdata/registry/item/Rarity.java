@@ -1,4 +1,4 @@
-package net.akarah.cdata.item;
+package net.akarah.cdata.registry.item;
 
 import net.akarah.cdata.util.Colors;
 import net.kyori.adventure.text.format.TextColor;

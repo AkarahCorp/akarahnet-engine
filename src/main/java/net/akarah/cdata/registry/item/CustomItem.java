@@ -1,4 +1,4 @@
-package net.akarah.cdata.item;
+package net.akarah.cdata.registry.item;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -8,7 +8,7 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
 import net.akarah.cdata.codec.EnumCodec;
 import net.akarah.cdata.codec.PaperCodecs;
-import net.akarah.cdata.stat.StatsObject;
+import net.akarah.cdata.registry.stat.StatsObject;
 import net.akarah.cdata.util.Colors;
 import net.akarah.cdata.util.Formatters;
 import net.akarah.cdata.Registries;
