@@ -16,10 +16,11 @@ import org.bukkit.persistence.PersistentDataType;
 import org.intellij.lang.annotations.Subst;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class StatManager implements Listener {
-    Map<UUID, StatsObject> stats = new HashMap<>();
+    ConcurrentMap<UUID, StatsObject> stats = new ConcurrentHashMap<>();
 
     public StatsObject get(UUID uuid) {
         if(!stats.containsKey(uuid)) {
@@ -68,6 +69,7 @@ public class StatManager implements Listener {
 
     public void updateEntityStats() {
         var keySet = this.stats.keySet();
+
         for(var uuid : keySet) {
             var entity = Bukkit.getEntity(uuid);
             if(entity == null) {
