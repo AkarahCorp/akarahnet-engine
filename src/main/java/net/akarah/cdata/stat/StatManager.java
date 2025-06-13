@@ -7,12 +7,17 @@ import net.akarah.cdata.item.CustomItem;
 import net.akarah.cdata.util.Keys;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.intellij.lang.annotations.Subst;
 
 import java.util.*;
@@ -82,6 +87,23 @@ public class StatManager implements Listener {
             stats.applyAttributes(player);
             this.stats.put(player.getUniqueId(), stats);
 
+            try {
+                Objects.requireNonNull(player.getAttribute(Attribute.ATTACK_SPEED))
+                        .addModifier(new AttributeModifier(
+                                new NamespacedKey(Engine.get(), "base"),
+                                Double.MAX_VALUE,
+                                AttributeModifier.Operation.ADD_NUMBER
+                        ));
+
+                Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_BREAK_SPEED))
+                        .addModifier(new AttributeModifier(
+                                new NamespacedKey(Engine.get(), "block_break_speed"),
+                                -1,
+                                AttributeModifier.Operation.MULTIPLY_SCALAR_1
+                        ));
+            } catch (IllegalArgumentException ignored) {
+
+            }
         }
     }
 

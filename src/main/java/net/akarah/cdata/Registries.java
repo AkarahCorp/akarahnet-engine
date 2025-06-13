@@ -2,6 +2,7 @@ package net.akarah.cdata;
 
 import net.akarah.cdata.entity.CustomEntity;
 import net.akarah.cdata.item.CustomItem;
+import net.akarah.cdata.mining.BlockMiningRule;
 import net.akarah.cdata.parsing.ResourceRegistry;
 import net.akarah.cdata.stat.CustomStat;
 import net.kyori.adventure.key.Key;
@@ -22,5 +23,10 @@ public class Registries {
     public static ResourceRegistry<CustomStat> CUSTOM_STAT = Engine.resources().register(
             Key.key("minecraft", "stat"),
             ResourceRegistry.create(CustomStat.CODEC)
+    );
+
+    public static ResourceRegistry<BlockMiningRule> MINING_RULE = Engine.resources().register(
+            Key.key("minecraft", "mining_rule"),
+            ResourceRegistry.create(BlockMiningRule.CODEC)
     );
 }

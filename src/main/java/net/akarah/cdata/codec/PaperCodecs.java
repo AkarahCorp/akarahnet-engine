@@ -6,8 +6,8 @@ import net.akarah.cdata.Engine;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.BlockType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.WorldInfo;
@@ -45,5 +45,12 @@ public class PaperCodecs {
 
     public static Codec<Key> KEY = Codec.STRING.xmap(Key::key, Key::asString);
 
-    public static Codec<EntityType> ENTITY_TYPE = EnumCodec.of(EntityType.class);
+    public static Codec<EntityType> ENTITY_TYPE = PaperCodecs.KEY.xmap(
+            Registry.ENTITY_TYPE::get,
+            Keyed::key
+    );
+    public static Codec<BlockType> BLOCK_TYPE = PaperCodecs.KEY.xmap(
+            Registry.BLOCK::get,
+            Keyed::key
+    );
 }

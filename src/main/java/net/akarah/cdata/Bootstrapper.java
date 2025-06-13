@@ -7,11 +7,21 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.EntitySele
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.keys.BlockTypeKeys;
+import io.papermc.paper.registry.tag.TagKey;
+import io.papermc.paper.tag.TagEntry;
 import net.akarah.cdata.parsing.ServerResources;
 import net.kyori.adventure.key.Key;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockType;
 import org.bukkit.entity.Player;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Bootstrapper implements PluginBootstrap {
     @Override
@@ -19,10 +29,27 @@ public class Bootstrapper implements PluginBootstrap {
     public void bootstrap(@NotNull BootstrapContext context) {
         Engine.LOGGER = context.getLogger();
         Engine.RESOURCES = new ServerResources();
-        Registries.init();
-        Engine.resources().loadFromFiles();
+
+        LifecycleEvents.TAGS.preFlatten(RegistryKey.BLOCK).newHandler(event -> {
+            var list = new ArrayList<TagEntry<BlockType>>();
+            for(var field : BlockTypeKeys.class.getDeclaredFields()) {
+               try {
+                   var value = (TypedKey<BlockType>) field.get(null);
+                   list.add(TagEntry.valueEntry(value));
+               } catch (Exception e) {
+                   System.out.println(e);
+               }
+            }
+            event.registrar().setTag(
+                    TagKey.create(RegistryKey.BLOCK, Key.key("akarahnet:all_blocks")),
+                    list
+            );
+        });
 
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            Registries.init();
+            Engine.resources().loadFromFiles();
+
             var dispatcher = event.registrar();
 
             var root = Commands.literal("engine")

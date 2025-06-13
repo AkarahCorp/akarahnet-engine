@@ -1,6 +1,7 @@
 package net.akarah.cdata;
 
 import net.akarah.cdata.entity.CustomEntityEvents;
+import net.akarah.cdata.mining.CustomMiningEvents;
 import net.akarah.cdata.parsing.ServerResources;
 import net.akarah.cdata.stat.StatManager;
 import net.kyori.adventure.text.Component;
@@ -21,6 +22,7 @@ public class Engine extends JavaPlugin {
         Engine.INSTANCE = this;
 
         Bukkit.getServer().getPluginManager().registerEvents(new CustomEntityEvents(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new CustomMiningEvents(), this);
         Bukkit.getServer().getPluginManager().registerEvents(STAT_MANAGER, this);
 
         Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, task -> STAT_MANAGER.updateEntityStats(), 1, 5);
