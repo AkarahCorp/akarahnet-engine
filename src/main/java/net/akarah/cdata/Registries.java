@@ -16,6 +16,11 @@ public class Registries {
             ResourceRegistry.create(CustomItem.CODEC)
     );
 
+    public static ResourceRegistry<WeightedLootTable> LOOT_TABLE = Engine.resources().register(
+            Key.key("minecraft", "loot_table"),
+            ResourceRegistry.create(WeightedLootTable.CODEC)
+    );
+
     public static ResourceRegistry<CustomEntity> CUSTOM_ENTITY = Engine.resources().register(
             Key.key("minecraft", "entity"),
             ResourceRegistry.create(CustomEntity.CODEC)
@@ -29,12 +34,5 @@ public class Registries {
     public static ResourceRegistry<BlockMiningRule> MINING_RULE = Engine.resources().register(
             Key.key("minecraft", "mining_rule"),
             ResourceRegistry.create(BlockMiningRule.CODEC)
-    );
-
-
-
-    public static ResourceRegistry<WeightedLootTable> LOOT_TABLE = Engine.resources().register(
-            Key.key("minecraft", "loot_table"),
-            ResourceRegistry.create(WeightedLootTable.CODEC)
     );
 }

@@ -4,6 +4,7 @@ import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import net.akarah.cdata.Engine;
 import net.akarah.cdata.Registries;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -90,7 +91,15 @@ public class CustomMiningEvents implements Listener {
         );
 
         if(currentProgress >= miningTime) {
-            newTarget.getBlock().breakNaturally();
+            newTarget.getBlock().setType(Material.AIR);
+            rule.lootTable().ifPresent(lootTable -> {
+                for(var item : lootTable.get().roll()) {
+                    newTarget.getWorld().dropItem(
+                            newTarget,
+                            item
+                    );
+                }
+            });
         } else {
             event.getPlayer().sendBlockDamage(
                     newTarget,
