@@ -57,7 +57,6 @@ public class Bootstrapper implements PluginBootstrap {
 
             var itemRoot = Commands.literal("give");
             Registries.CUSTOM_ITEM.forEach(((@Subst("minecraft:empty") var key, var customItem) -> {
-                System.out.println("key; " + key + " custom; " + customItem);
                 itemRoot.then(
                         Commands.literal(Key.key(key.namespace(), key.value()).asString()).executes(ctx -> {
                             var sender = ctx.getSource().getSender();
@@ -70,9 +69,23 @@ public class Bootstrapper implements PluginBootstrap {
                 );
             }));
 
+            var lootTableRoot = Commands.literal("roll");
+            Registries.LOOT_TABLE.forEach(((@Subst("minecraft:empty") var key, var lootTable) -> {
+                lootTableRoot.then(
+                        Commands.literal(Key.key(key.namespace(), key.value()).asString()).executes(ctx -> {
+                            var sender = ctx.getSource().getSender();
+                            if (sender instanceof Player p) {
+                                for(var item : lootTable.roll()) {
+                                    p.getInventory().addItem(item);
+                                }
+                            }
+                            return 0;
+                        })
+                );
+            }));
+
             var entityRoot = Commands.literal("summon");
             Registries.CUSTOM_ENTITY.forEach(((@Subst("minecraft:empty") var key, var customEntity) -> {
-                System.out.println("key; " + key + " custom; " + customEntity);
                 entityRoot.then(
                         Commands.literal(Key.key(key.namespace(), key.value()).asString()).executes(ctx -> {
                             var sender = ctx.getSource().getSender();
@@ -103,6 +116,7 @@ public class Bootstrapper implements PluginBootstrap {
 
             root.then(itemRoot);
             root.then(entityRoot);
+            root.then(lootTableRoot);
 
             dispatcher.register(root.build());
         });

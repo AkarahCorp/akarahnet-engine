@@ -2,6 +2,7 @@ package net.akarah.cdata;
 
 import net.akarah.cdata.registry.entity.CustomEntity;
 import net.akarah.cdata.registry.item.CustomItem;
+import net.akarah.cdata.registry.loot.WeightedLootTable;
 import net.akarah.cdata.registry.mining.BlockMiningRule;
 import net.akarah.cdata.parsing.ResourceRegistry;
 import net.akarah.cdata.registry.stat.CustomStat;
@@ -28,5 +29,12 @@ public class Registries {
     public static ResourceRegistry<BlockMiningRule> MINING_RULE = Engine.resources().register(
             Key.key("minecraft", "mining_rule"),
             ResourceRegistry.create(BlockMiningRule.CODEC)
+    );
+
+
+
+    public static ResourceRegistry<WeightedLootTable> LOOT_TABLE = Engine.resources().register(
+            Key.key("minecraft", "loot_table"),
+            ResourceRegistry.create(WeightedLootTable.CODEC)
     );
 }

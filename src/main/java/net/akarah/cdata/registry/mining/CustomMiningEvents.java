@@ -29,10 +29,6 @@ public class CustomMiningEvents implements Listener {
         var uuid = player.getUniqueId();
 
         var oldTarget = targetBlock.getOrDefault(uuid, DEFAULT_LOC).toCenterLocation();
-        System.out.println(
-                Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE))
-                        .getValue()
-        );
         var rayTraceResult = player.rayTraceBlocks(
                 Objects.requireNonNull(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE))
                         .getValue()
@@ -77,7 +73,6 @@ public class CustomMiningEvents implements Listener {
         });
 
         AtomicReference<BlockMiningRule> usedRule = new AtomicReference<>();
-        System.out.println(newTarget.getBlock().getType().asBlockType());
         Registries.MINING_RULE.forEach((name, rule) -> {
             if(rule.blockTypes().contains(newTarget.getBlock().getType().asBlockType())) {
                 usedRule.set(rule);
