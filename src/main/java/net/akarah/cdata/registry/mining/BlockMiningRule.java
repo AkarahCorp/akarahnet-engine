@@ -18,12 +18,14 @@ public record BlockMiningRule(
         List<BlockType> blockTypes,
         double hardness,
         Key speedStat,
+        Optional<Key> spreadStat,
         Optional<RegistryHolder<WeightedLootTable>> lootTable
 ) implements RegistryElement<BlockMiningRule> {
     public static Codec<BlockMiningRule> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             PaperCodecs.BLOCK_TYPE.listOf().fieldOf("block_types").forGetter(BlockMiningRule::blockTypes),
             Codec.DOUBLE.fieldOf("hardness").forGetter(BlockMiningRule::hardness),
             PaperCodecs.KEY.fieldOf("speed_stat").forGetter(BlockMiningRule::speedStat),
+            PaperCodecs.KEY.optionalFieldOf("spread_stat").forGetter(BlockMiningRule::spreadStat),
             RegistryHolder.codec(Registries.LOOT_TABLE).optionalFieldOf("loot_table").forGetter(BlockMiningRule::lootTable)
     ).apply(instance, BlockMiningRule::new));
 
