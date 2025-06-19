@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17"
 }
 
 group = "dev.akarah"
@@ -19,7 +20,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    compileOnly("io.papermc.paper:paper-api:1.21.6-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.6-R0.1-SNAPSHOT")
     compileOnly("com.mojang:datafixerupper:8.0.16")
 }
 
