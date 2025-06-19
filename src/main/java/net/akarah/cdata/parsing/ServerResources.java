@@ -10,7 +10,6 @@ import org.intellij.lang.annotations.Subst;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,29 +21,26 @@ public class ServerResources {
         return registry;
     }
 
-    public void loadFromFiles() {
-        System.out.println("Loading from files!");
-        var rootPath = Paths.get("./cdata/");
-
+    public void loadFromFiles(Path rootPath) {
         try (var pathStream = Files.walk(rootPath)) {
             pathStream
                     .filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".json"))
-                    .filter(path -> rootPath.relativize(path).getNameCount() >= 3)
-                    .forEach(this::loadFromPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+                    .forEach(path -> {
+                        try {
+                            var relativizedPath = rootPath.relativize(path);
+                            var contents = Files.readString(path);
+                            loadFromPath(relativizedPath, contents);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        } catch (IOException ignored) {}
     }
 
-    public <T> void loadFromPath(Path path) {
-        System.out.println(path);
-
-        var cdataName = path.getName(1).toString();
-        assert cdataName.equals("cdata");
-
-        @Subst("minecraft") var namespace = path.getName(2).toString();
-        @Subst("unknown") var registry = path.getName(3).toString();
+    public <T> void loadFromPath(Path path, String contents) {
+        @Subst("minecraft") var namespace = path.getName(0).toString();
+        @Subst("unknown") var registry = path.getName(1).toString();
 
         var registryKey = Key.key("minecraft", registry);
 
@@ -57,25 +53,22 @@ public class ServerResources {
         }
         var registryCodec = dataRegistry.valueCodec();
 
-        try {
-            var json = new Gson().fromJson(Files.readString(path), JsonElement.class);
-            var encoded = registryCodec.decode(JsonOps.INSTANCE, json);
+        var json = new Gson().fromJson(contents, JsonElement.class);
+        var encoded = registryCodec.decode(JsonOps.INSTANCE, json);
 
-            var subpath = path.subpath(4, path.getNameCount());
-            @Subst("empty") var keyValue = subpath.toString().replace(".json", "");
+        var subpath = path.subpath(2, path.getNameCount());
+        @Subst("empty") var keyValue = subpath.toString().replace(".json", "");
 
-            var entryKey = Key.key(namespace, keyValue);
+        var entryKey = Key.key(namespace, keyValue);
 
-            if(encoded.isError()) {
-                Engine.logger().error("Error occurred while loading resource {} / {}", registryKey, entryKey);
-                Engine.logger().error(encoded.error().orElseThrow().message());
-                return;
-            }
-            var encodedFinal = encoded.getOrThrow().getFirst();
-
-            dataRegistry.insert(entryKey, encodedFinal);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(encoded.isError()) {
+            Engine.logger().error("Error occurred while loading resource {} / {}", registryKey, entryKey);
+            Engine.logger().error(encoded.error().orElseThrow().message());
+            return;
         }
+        Engine.logger().info("Loaded {} into registry {}", entryKey, registryKey);
+        var encodedFinal = encoded.getOrThrow().getFirst();
+
+        dataRegistry.insert(entryKey, encodedFinal);
     }
 }

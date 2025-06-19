@@ -1,5 +1,6 @@
 package net.akarah.cdata;
 
+import io.papermc.paper.datapack.DatapackSource;
 import net.akarah.cdata.registry.entity.CustomEntityEvents;
 import net.akarah.cdata.registry.mining.CustomMiningEvents;
 import net.akarah.cdata.parsing.ServerResources;
@@ -9,6 +10,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Properties;
 
 public class Engine extends JavaPlugin {
     static ServerResources RESOURCES;
@@ -20,6 +26,7 @@ public class Engine extends JavaPlugin {
     @Override
     public void onEnable() {
         Engine.INSTANCE = this;
+        Engine.LOGGER = this.getComponentLogger();
 
         Bukkit.getServer().getPluginManager().registerEvents(new CustomEntityEvents(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new CustomMiningEvents(), this);
