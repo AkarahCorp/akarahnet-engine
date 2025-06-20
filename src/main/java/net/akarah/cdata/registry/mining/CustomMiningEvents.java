@@ -138,27 +138,27 @@ public class CustomMiningEvents implements Listener {
     public void executeBlockBreak(BlockMiningRule rule, Location blockPos) {
         blockPos.getBlock().setType(Material.AIR);
 
-        rule.lootTable().ifPresent(lootTable -> {
-            for(var item : lootTable.get().roll()) {
-                blockPos.getWorld().dropItem(
-                        blockPos,
-                        item
-                );
-            }
-        });
+//        rule.lootTable().ifPresent(lootTable -> {
+//            for(var item : lootTable.get().roll()) {
+//                blockPos.getWorld().dropItem(
+//                        blockPos,
+//                        item
+//                );
+//            }
+//        });
     }
 
     public void breakRecursively(Player p, BlockMiningRule rule, Location blockPos, double spreadRemainder) {
-        if(spreadRemainder >= 1) {
+        if(Math.random() <= spreadRemainder) {
             executeRecursiveBreak(p, rule, blockPos, spreadRemainder);
-        } else {
-            if(Math.random() <= spreadRemainder) {
-                executeRecursiveBreak(p, rule, blockPos, spreadRemainder);
-            }
         }
     }
 
     public void executeRecursiveBreak(Player p, BlockMiningRule rule, Location blockPos, double spreadRemainder) {
+        System.out.println(blockPos + " @ " + spreadRemainder);
+
+        var tr = spreadRemainder;
+        var positionsToBreak = new ArrayList<Location>();
         executeBlockBreak(rule, blockPos);
 
         Collections.shuffle(VECTORS);
@@ -166,14 +166,19 @@ public class CustomMiningEvents implements Listener {
         for(var vector : VECTORS) {
             var shiftedPos = blockPos.clone().add(vector);
             var material = shiftedPos.getBlock().getType().asBlockType();
-            if(rule.blockTypes().contains(material)) {
-                Bukkit.getGlobalRegionScheduler().runDelayed(
-                        Engine.get(),
-                        task -> breakRecursively(p, rule, shiftedPos, spreadRemainder - 1),
-                        1
-                );
-                break;
+            if(rule.blockTypes().contains(material) && Math.random() < tr) {
+                positionsToBreak.add(shiftedPos);
+                tr -= 1;
             }
+        }
+
+        for(var shiftedPos : positionsToBreak) {
+            var rm = tr;
+            Bukkit.getGlobalRegionScheduler().runDelayed(
+                    Engine.get(),
+                    task -> breakRecursively(p, rule, shiftedPos, rm),
+                    1
+            );
         }
     }
 }
